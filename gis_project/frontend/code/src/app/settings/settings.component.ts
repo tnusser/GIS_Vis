@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-settings',
@@ -51,5 +52,13 @@ export class SettingsComponent {
    */
   addPubs(): void {
     this.pubsAdded.emit(true);
+  }
+
+  menuFunction(): void {
+    console.log("x");
+  }
+
+  openDialog(): void {
+    console.log("x");
   }
 }
