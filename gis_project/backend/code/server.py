@@ -14,7 +14,7 @@ def get_Boundaries():
     app.logger.info(request.json)
 
     # GET VALUES FROM FRONTEND VIA
-    request.get_json().get('$event')
+    # request.get_json().get('$event')
 
     normalize = False
     year = 2019
