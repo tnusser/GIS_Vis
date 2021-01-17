@@ -9,13 +9,15 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog'
 
 // own components
 import { AppComponent } from './app.component';
 import { MapComponent } from './map/map.component';
+import { SettingsComponent, DialogElementsExampleDialog, DialogForSettings} from './settings/settings.component';
 
 @NgModule({
-  declarations: [AppComponent, MapComponent],
+  declarations: [AppComponent, MapComponent, SettingsComponent, DialogForSettings, DialogElementsExampleDialog],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -24,7 +26,12 @@ import { MapComponent } from './map/map.component';
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,
-    HttpClientModule
+    HttpClientModule, 
+    MatDialogModule
+  ],
+  entryComponents: [
+    DialogElementsExampleDialog,
+    DialogForSettings
   ],
   providers: [],
   bootstrap: [AppComponent],

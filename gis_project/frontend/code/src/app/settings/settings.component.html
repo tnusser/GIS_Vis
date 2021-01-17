@@ -1,37 +1,14 @@
-<div id="settings-panel">
-  <form
-    id="location-form"
-    [formGroup]="this.locationForm"
-    (ngSubmit)="onSubmit(this.locationForm.value)"
-  >
-    <mat-form-field>
-      <mat-label>Latitude</mat-label>
-      <input
-        matInput
-        type="number"
-        placeholder="Latitude"
-        min="-90"
-        max="90"
-        step="0.001"
-        formControlName="latitude"
-      />
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Longitude</mat-label>
-      <input
-        matInput
-        type="number"
-        placeholder="Longitude"
-        min="-90"
-        max="90"
-        step="0.001"
-        formControlName="longitude"
-      />
-    </mat-form-field>
-    <button class="button" type="submit" mat-stroked-button>Add Marker</button>
-  </form>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-  <div class="pubs">
-    <button class="button" (click)="addPubs()" mat-stroked-button>Add Pubs</button>
-  </div>
+<div id="settings-panel">
+
+<div class="container" (click)="openSettingsDialog()">
+  <div class="bar1"></div>
+  <div class="bar2"></div>
+  <div class="bar3"></div>
+</div>
+
+<h1>Fertility & Mortality Visualisation</h1>
+
+<button class="btn" id="helper" (click)="openDialog()"><i class="fa fa-question-circle"></i></button>
 </div>
