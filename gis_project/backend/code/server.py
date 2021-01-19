@@ -13,15 +13,23 @@ CORS(app)
 def get_Boundaries():
     app.logger.info(request.json)
 
-    # GET VALUES FROM FRONTEND VIA
-    # request.get_json().get('$event')
-
-    normalize = False
+    birth, death, relative, absolute = True, False, True, False
     year = 2019
-    birth = True
-    death = False
+
+    try:
+        birth = request.get_json().get('birth')
+        death = request.get_json().get('death')
+        year = request.get_json().get('year')
+        relative = request.get_json().get('relative')
+        absolute = request.get_json().get('absolute')
+
+    except AttributeError:
+        app.logger.info("event not there")
+
+    app.logger.info(relative)
 
     numbars = 'birth' if birth else 'death'
+    normalize = relative if relative else absolute
 
     with psycopg2.connect(host="database", port=5432, dbname="gis", user="testuser", password="testpw") as conn:
         with conn.cursor() as cursor:
@@ -36,12 +44,20 @@ def get_Boundaries():
     # convert results to a GeoJSON
     geojsons = []
     for result in results:
+        if normalize:
+            if int(result[numbars]) < 0 or int(result['population']) < 1:
+                result[numbars] = -1
+            else:
+                result[numbars] = int((int(result[numbars]) / int(result['population'])) * 100000)
+        else:
+            if int(result[numbars]) < 0:
+                result[numbars] = -1
         geojsons.append({
             "type": "Feature",
             "id": result['osm_id'],
             "properties": {
                 "name": result['name'],
-                "numbars": float(result[numbars])
+                "numbars": int(result[numbars])
             },
             "geometry": json.loads(result['geometry'])
         })
@@ -54,7 +70,7 @@ def get_Boundaries():
 
 
 def build_query(year):
-    app.logger.info("Build Query")
+    app.logger.info("Build Query with year: " + str(year))
 
     query = """WITH bezirke AS (SELECT osm_id, name, geometry AS geom FROM polygon_cropped pop), 
     q_data AS ( SELECT osm_id, year, birth, death, population FROM public.pop_stat where year = %s)

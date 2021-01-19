@@ -20,6 +20,9 @@ export class DataService {
    */
   public getBarDistribution(): Observable<FeatureCollection> {
     const url = 'http://localhost:5000/numbars';
-    return this.http.post<FeatureCollection>(url, {}, httpOptions);
+
+    // hard coded data
+    let data = {'birth' : true, 'death' : false, 'year' : 2007, 'relative' : true , 'absolute' : false}
+        return this.http.post<FeatureCollection>(url, data, httpOptions);
   }
 }

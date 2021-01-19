@@ -20,6 +20,7 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.dataservice.getBarDistribution().subscribe((geojson: FeatureCollection) => {
+      console.log("Data retrieved from backend")
       this.mapcomponent.addGeoJSON(geojson);
     });
   }
