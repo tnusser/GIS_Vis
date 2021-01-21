@@ -35,10 +35,6 @@ export class SettingsComponent {
     this.pubsAdded.emit(true);
   }
 
-  menuFunction(): void {
-    console.log("x");
-  }
- 
   constructor(public dialog: MatDialog) {}
 
   openDialog() {

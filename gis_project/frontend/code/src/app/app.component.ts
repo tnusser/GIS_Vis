@@ -19,8 +19,17 @@ export class AppComponent implements AfterViewInit {
   constructor(private dataservice: DataService) {}
 
   ngAfterViewInit(): void {
-    this.dataservice.getBarDistribution().subscribe((geojson: FeatureCollection) => {
+    this.dataservice.getBarDistribution(2007).subscribe((geojson: FeatureCollection) => {
       console.log("Data retrieved from backend")
+      this.mapcomponent.addGeoJSON(geojson);
+    });
+  }
+
+  updateView(): void {
+    let dateValue=document.getElementById("myRange").value;
+    console.log(dateValue);
+    this.dataservice.getBarDistribution(dateValue).subscribe((geojson: FeatureCollection) => {
+      console.log("Data retrieved from backend");
       this.mapcomponent.addGeoJSON(geojson);
     });
   }

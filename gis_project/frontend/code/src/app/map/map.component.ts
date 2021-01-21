@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output  } from '@angular/core';
 import { Feature, FeatureCollection, Geometry, MultiPolygon } from 'geojson';
 import * as L from 'leaflet';
 import * as d3 from 'd3';
@@ -22,6 +22,19 @@ export class MapComponent implements OnInit {
     return this._amenities;
   }
 
+  @Output()
+  viewUpdate: EventEmitter<boolean> = new EventEmitter<boolean>();
+  
+  updateSlider(): void {
+    console.log(document.getElementById("myRange").value);
+    this.viewUpdate.emit(true);
+  }
+
+  displayValue(): void {
+    //console.log(document.getElementById("myRange").value);
+    document.getElementById("bubbles").innerHTML = document.getElementById("myRange").value;
+  }
+  
   @Input()
   set amenities(
     value: { name: string; latitude: number; longitude: number }[]

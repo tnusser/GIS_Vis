@@ -18,11 +18,11 @@ export class DataService {
   /**
    * Get Pubs from Backend
    */
-  public getBarDistribution(): Observable<FeatureCollection> {
+  public getBarDistribution(date:number): Observable<FeatureCollection> {
     const url = 'http://localhost:5000/numbars';
 
     // hard coded data
-    let data = {'birth' : true, 'death' : false, 'year' : 2007, 'relative' : true , 'absolute' : false}
+    let data = {'birth' : true, 'death' : false, 'year' : date, 'relative' : true , 'absolute' : false}
         return this.http.post<FeatureCollection>(url, data, httpOptions);
   }
 }

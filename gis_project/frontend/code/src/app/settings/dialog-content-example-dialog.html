@@ -1,10 +1,16 @@
-<h2 mat-dialog-title>Help</h2>
+<h1 mat-dialog-title>Fertility & Mortality Visualisation Tool</h1>
+<h2 mat-dialog-title>Purpose</h2>
 <mat-dialog-content class="mat-typography">
-  <h3>Motivation</h3>
-  <p>Bla</p>
+<p>An extensively studied area of interest has been the relationship of birth . For newly developing countries, there seems to be a correlation between high infant and child mortality and high fertility. Often, when the child mortality began to sink due to better access to medicine and overall wealth in the country, also the fertility rate sank. Adapting the idea behind those studies, it would be interesting to know, where in Germany/(or in the world) nowadays children are born and where the most people are dying. There might be regional differences or interesting outliers. Furthermore interesting could be to compare the stillbirth rate based on geographic location and time. E.g. Beginning with the Chernobyl catastophe does the stillbirth rate significantly change especially in eastern european countries and how does it develop over time. One could then visualize this using an isarithmic mapping on europe (heatmap).</p>
 
-  
+<h2 mat-dialog-title>Dataset</h2>
+<p>A first starting point would be the dataset "Live births, stillbirths, deaths and balance of live births and deaths" of the Gesundheitsberichterstattung des Bundes  The dataset consists out of born children and overall deaths in germany from 1990 until 2019. They are partitioned on state-level but we are in contact with the Federal Statistical Office and might get access to the data by county. Furthermore provided are the amount of stillbirths, the age and the nationality of the mothers. The dataset seems to be quite clean which makes data cleaning obsolete. Despite some normalizations of the habitants we could use the data immediately. The mapping of states or counties can be done using OpenStreetMap</p>
+
+
+<h2 mat-dialog-title>Contact</h2>
+<p>This Visualization has been created by Tobias Nusser and Andreas Bäuerle in course of the lecture Geographic Information Systems WS 2020/2021 at the University of Constance.  </p>
+<p>andreas.baeuerle@uni-konstanz.de</p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button mat-dialog-close>Close</button>
 </mat-dialog-actions>
