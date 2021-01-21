@@ -119,14 +119,36 @@ export class MapComponent implements OnInit {
         ? feature.properties.numbars
         : 0;
 
+      // console.log(numbars);
+      if(numbars == -1) {
+        return {
+          fillColor: 'white',
+          weight: 2,
+          opacity: 1,
+          color: 'red',
+          dashArray: '3',
+          fillOpacity: 0.7,
+        };
+      }
+      else {
+        return {
+          fillColor: colorscale(numbars),
+          weight: 2,
+          opacity: 1,
+          color: 'red',
+          dashArray: '3',
+          fillOpacity: 0.7,
+        };
+      }
+      /*
       return {
         fillColor: colorscale(numbars),
         weight: 2,
         opacity: 1,
-        color: 'white',
+        color: 'red',
         dashArray: '3',
         fillOpacity: 0.7,
-      };
+      };*/
     };
 
     // each feature gets an additional popup!
@@ -137,7 +159,7 @@ export class MapComponent implements OnInit {
         typeof feature.properties.numbars !== 'undefined'
       ) {
         layer.bindPopup(
-          `${feature.properties.name} has ${feature.properties.numbars} bar${
+          `${feature.properties.name} has ${feature.properties.numbars} birth${
             feature.properties.numbars > 0 ? 's' : ''
           }`
         );
