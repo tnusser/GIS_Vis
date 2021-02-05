@@ -19,18 +19,39 @@ export class AppComponent implements AfterViewInit {
   constructor(private dataservice: DataService) {}
 
   ngAfterViewInit(): void {
-    this.dataservice.getBarDistribution(2007).subscribe((geojson: FeatureCollection) => {
+    //TBC send Fert and Normalized
+    console.log('ViewInit');
+    /*this.dataservice.getBarDistribution(2007).subscribe((geojson: FeatureCollection) => {
       console.log("Data retrieved from backend")
       this.mapcomponent.addGeoJSON(geojson);
-    });
+    });*/
+    
   }
 
   updateView(): void {
-    let dateValue=document.getElementById("myRange").value;
-    console.log(dateValue);
-    this.dataservice.getBarDistribution(dateValue).subscribe((geojson: FeatureCollection) => {
-      console.log("Data retrieved from backend");
-      this.mapcomponent.addGeoJSON(geojson);
-    });
+    console.log('updateView with: ');
+
+    let dateValue=(<HTMLInputElement>document.getElementById("myRange")).value;
+    console.log('date' + dateValue);
+
+    let radiosGroup2 = document.getElementsByName('state-a');
+    console.log(radiosGroup2);
+    
+    console.log();
+    //const formNorm = document.forms.norm as HTMLCollectionOf<HTMLElement>;
+    //const radiosFormNorm = formNorm.elements.characters;
+
+    //console.log(radiosFormNorm);
+
+    //let normIdent =(<HTMLInputElement>document.getElementById("absolute")).value;
+    //console.log('date' + normIdent);
+
+    //let =(<HTMLInputElement>document.getElementById("myRange")).value;
+    //console.log('date' + dateValue);
+    
+    //this.dataservice.getBarDistribution(dateValue).subscribe((geojson: FeatureCollection) => {
+    //  console.log("Data retrieved from backend");
+    //  this.mapcomponent.addGeoJSON(geojson);
+    //});
   }
 }

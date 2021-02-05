@@ -1,7 +1,32 @@
-<h1 mat-dialog-title>Hi</h1>
+
+<h1 mat-dialog-title>Settings</h1>
 <div mat-dialog-content>
-  <p>What's your favorite animal?</p>
+  <p>Which Rate shall be visualised?</p>
+  <div class="switch-toggle switch-3 switch-candy">
+    <input id="on" name="state-d" type="radio" checked="" />
+    <label for="on" onclick="">Fertility Rate</label>
+  
+    <input id="na" name="state-d" type="radio" />
+    <label for="na"  onclick="">Mortality Rate</label>
+  
+    <input id="off" name="state-d" type="radio" />
+    <label for="off" onclick="">Both</label>
+  
+    <a></a>
+  </div>
+  <h3></h3>
+  <p>Shall the rates be normalized or given in absolute figures?</p>
+  <div class="switch-toggle switch-3">
+    <input id="absolute" name="state-a" type="radio" />
+    <label for="absolute" onclick="">Absolute</label>
+  
+    <input id="normalized" name="state-a" type="radio" checked="" />
+    <label for="normalized"  onclick="">Normalized</label>
+    
+    <a></a>
+  </div>
 </div> 
 <div mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancel</button>
-</div>
+  <button mat-button mat-dialog-close>Cancel & Close</button>
+  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Adapt Changes</button>
+</div> 

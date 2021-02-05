@@ -26,13 +26,17 @@ export class MapComponent implements OnInit {
   viewUpdate: EventEmitter<boolean> = new EventEmitter<boolean>();
   
   updateSlider(): void {
-    console.log(document.getElementById("myRange").value);
+    //console.log(this.mySlider1.nativeElement.innerHTML);
+    //console.log(document.getElementById("myRange").value);
+    console.log((<HTMLInputElement>document.getElementById("myRange")).value);
     this.viewUpdate.emit(true);
   }
 
   displayValue(): void {
     //console.log(document.getElementById("myRange").value);
-    document.getElementById("bubbles").innerHTML = document.getElementById("myRange").value;
+    //TBC
+    //document.getElementById("bubbles").innerHTML = document.getElementById("myRange").value;
+    (<HTMLInputElement>document.getElementById("bubbles")).innerHTML = (<HTMLInputElement>document.getElementById("myRange")).value
   }
   
   @Input()

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
+import {MatDialogModule} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-settings',
@@ -37,12 +38,29 @@ export class SettingsComponent {
 
   constructor(public dialog: MatDialog) {}
 
+  @Output()
+  settUpdate: EventEmitter<boolean> = new EventEmitter<boolean>();
+  
+  updateSettings(): void {
+    //console.log((<HTMLInputElement>document.getElementById("myRange")).value);
+    this.settUpdate.emit(true);
+  }
+
   openDialog() {
     this.dialog.open(DialogElementsExampleDialog);
   }
 
   openSettingsDialog() {
-    this.dialog.open(DialogForSettings);
+    const dialogSettings = this.dialog.open(DialogForSettings);
+
+    dialogSettings.afterClosed().subscribe(result => {
+      if (result){   
+        this.updateSettings();
+      } 
+      else {
+        console.log(`Dialog result: ${result}`);
+      }
+    });
   }
 
 }
