@@ -3,39 +3,16 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 import {MatDialogModule} from '@angular/material/dialog';
 
+declare var norm4Back: String;
+declare var rate4Back: String;
+
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent {
-  // this output can be listened to in the parent component
-  @Output()
-  markerAdded: EventEmitter<{
-    latitude: number;
-    longitude: number;
-  }> = new EventEmitter<{ latitude: number; longitude: number }>();
-
-  // this output can be listened to in the parent component
-  @Output()
-  pubsAdded: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-  /**
-   * When the add marker button was clicked, emit the location where the marker should be added
-   * @param marker Latitude and longitude of the marker
-   */
-  onSubmit(marker: { latitude: number; longitude: number }): void {
-    this.markerAdded.emit(marker);
-  }
-
-    /**
-   * When the add marker button was clicked, emit the location where the marker should be added
-   * @param marker Latitude and longitude of the marker
-   */
-  addPubs(): void {
-    this.pubsAdded.emit(true);
-  }
-
+  
   constructor(public dialog: MatDialog) {}
 
   @Output()
@@ -62,7 +39,7 @@ export class SettingsComponent {
       }
     });
   }
-
+  
 }
 
 @Component({
@@ -75,19 +52,15 @@ export class DialogElementsExampleDialog {}
   selector: 'dialog-elements-example-dialog',
   templateUrl: './dialog-content-settings.html',
 })
-export class DialogForSettings {}
-
-
-
-/*
-@Component({
-  selector: 'app-settings',
-  templateUrl: './settings.component.html',
-})
-export class DialogElementsExample {
-  constructor(public dialog: MatDialog) {}
-
-  openDialog() {
-    this.dialog.open(DialogElementsExampleDialog);
+export class DialogForSettings {
+  normWhich(data:String) {
+    //console.log('erfolg' + data);
+    globalThis.norm4Back= data;
   }
-}*/
+
+  rateWhich(data:String) {
+    //console.log('erfolg' + data);
+    globalThis.rate4Back= data;
+  }
+
+}

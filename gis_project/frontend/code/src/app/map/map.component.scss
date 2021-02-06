@@ -1,11 +1,29 @@
+.wrapper {
+  position: relative;
+}
+
 #map {
     width: 100%;
     height: 87%;
+    position: relative;
 }
 
+#legend{
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  /*
+  *  Styling only, the below can be changed or removed
+  *  depending on your use case
+  */
+  height: 20px;
+  padding: 10px 10px;
+}
 body {
   margin: 2rem;
 } 
+
 .slidecontainer {
     height: min-content;
     width: 100%; /* Width of the outside container */

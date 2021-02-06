@@ -3,25 +3,25 @@
 <div mat-dialog-content>
   <p>Which Rate shall be visualised?</p>
   <div class="switch-toggle switch-3 switch-candy">
-    <input id="on" name="state-d" type="radio" checked="" />
-    <label for="on" onclick="">Fertility Rate</label>
+    <input id="on" name="state-d" type="radio" (click)="rateWhich('fert')" checked="" />
+    <label for="on" (click)="rateWhich('fert')" >Fertility Rate</label>
   
-    <input id="na" name="state-d" type="radio" />
-    <label for="na"  onclick="">Mortality Rate</label>
+    <input id="na"  (click)="rateWhich('mort')" name="state-d" type="radio" />
+    <label for="na"  (click)="rateWhich('mort')" >Mortality Rate</label>
   
-    <input id="off" name="state-d" type="radio" />
-    <label for="off" onclick="">Both</label>
+    <input id="off"  (click)="rateWhich('both')" name="state-d" type="radio" />
+    <label for="off"  (click)="rateWhich('both')" >Both</label>
   
     <a></a>
   </div>
   <h3></h3>
   <p>Shall the rates be normalized or given in absolute figures?</p>
   <div class="switch-toggle switch-3">
-    <input id="absolute" name="state-a" type="radio" />
-    <label for="absolute" onclick="">Absolute</label>
+    <input id="absolute" name="state-a" (click)="normWhich('abs')" type="radio" />
+    <label for="absolute" (click)="normWhich('abs')">Absolute</label>
   
-    <input id="normalized" name="state-a" type="radio" checked="" />
-    <label for="normalized"  onclick="">Normalized</label>
+    <input id="normalized" name="state-a" type="radio" (click)="normWhich('norm')" checked="" />
+    <label for="normalized"  (click)="normWhich('norm')">Normalized</label>
     
     <a></a>
   </div>
