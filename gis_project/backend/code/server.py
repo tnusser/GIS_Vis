@@ -1,12 +1,13 @@
-from flask import Flask, jsonify, escape, request
+from flask import Flask, jsonify, escape, request, session
 from flask_cors import CORS
 import json
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-app = Flask(__name__)
-CORS(app)
 
+app = Flask(__name__)
+app.config.from_object(__name__)
+CORS(app)
 
 
 @app.route('/numbars', methods=["GET", "POST"])
@@ -28,8 +29,15 @@ def get_Boundaries():
 
     app.logger.info(relative)
 
+    if birth and not death and str(year) == "2007" and relative and not absolute:
+       init = True
+    else:
+        init = False
+
     numbars = 'birth' if birth else 'death'
-    normalize = relative if relative else absolute
+    normalize = relative if relative else False
+
+    app.logger.info("normalize: " + str(normalize))
 
     with psycopg2.connect(host="database", port=5432, dbname="gis", user="testuser", password="testpw") as conn:
         with conn.cursor() as cursor:
@@ -40,27 +48,48 @@ def get_Boundaries():
     # return jsonify([{'name': r[0], 'way': r[1]} for r in results]), 200
 
     app.logger.info(jsonify(results))
-
     # convert results to a GeoJSON
+
     geojsons = []
-    for result in results:
-        if normalize:
-            if int(result[numbars]) < 0 or int(result['population']) < 1:
-                result[numbars] = -1
+
+    if init:
+        for result in results:
+            if normalize:
+                if int(result[numbars]) < 0 or int(result['population']) < 1:
+                    result[numbars] = -1
+                else:
+                    result[numbars] = int((int(result[numbars]) / int(result['population'])) * 100000)
             else:
-                result[numbars] = int((int(result[numbars]) / int(result['population'])) * 100000)
-        else:
-            if int(result[numbars]) < 0:
-                result[numbars] = -1
-        geojsons.append({
-            "type": "Feature",
-            "id": result['osm_id'],
-            "properties": {
-                "name": result['name'],
-                "numbars": int(result[numbars])
-            },
-            "geometry": json.loads(result['geometry'])
-        })
+                if int(result[numbars]) < 0:
+                    result[numbars] = -1
+            geojsons.append({
+                "type": "Feature",
+                "id": result['osm_id'],
+                "properties": {
+                    "name": result['name'],
+                    "numbars": int(result[numbars])
+                },
+                "geometry": json.loads(result['geometry'])
+            })
+    else:
+        for result in results:
+            if normalize:
+                if int(result[numbars]) < 0 or int(result['population']) < 1:
+                    result[numbars] = -1
+                else:
+                    result[numbars] = int((int(result[numbars]) / int(result['population'])) * 100000)
+            else:
+                if int(result[numbars]) < 0:
+                    result[numbars] = -1
+            geojsons.append({
+                "type": "Feature",
+                "id": result['osm_id'],
+                "properties": {
+                    "name": result['name'],
+                    "numbars": int(result[numbars])
+                },
+                "geometry": None
+            })
     app.logger.info("Geojson built")
 
     # return all results as a feature collection

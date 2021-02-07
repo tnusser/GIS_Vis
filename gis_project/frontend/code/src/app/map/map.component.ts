@@ -5,7 +5,7 @@ import * as d3 from 'd3';
 
 
 declare global {
-  var oldGEOJSON: any; 
+  var oldGEOJSON: any;
 }
 
 @Component({
@@ -14,6 +14,10 @@ declare global {
   styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit {
+
+  private geometry_list: Array<Geometry> = [];
+  private initialized: boolean = false;
+
   private map!: L.Map;
   private amenitiesLayer: L.LayerGroup<any> = L.layerGroup();
 
@@ -29,7 +33,7 @@ export class MapComponent implements OnInit {
 
   @Output()
   viewUpdate: EventEmitter<boolean> = new EventEmitter<boolean>();
-  
+
   updateSlider(): void {
     //console.log(this.mySlider1.nativeElement.innerHTML);
     //console.log(document.getElementById("myRange").value);
@@ -44,7 +48,7 @@ export class MapComponent implements OnInit {
     //document.getElementById("bubbles").innerHTML = document.getElementById("myRange").value;
     (<HTMLInputElement>document.getElementById("bubbles")).innerHTML = (<HTMLInputElement>document.getElementById("myRange")).value
   }
-  
+
   /**
    * Often divs and other HTML element are not available in the constructor. Thus we use onInit()
    */
@@ -82,6 +86,19 @@ export class MapComponent implements OnInit {
    */
   public addGeoJSON(geojson: FeatureCollection): void {
     // find maximum numbars value in array
+    // console.log(geojson["features"][0]["type"])
+    if (!this.initialized || this.geometry_list.length == 0) {
+      for (let item of geojson["features"]) {
+        this.geometry_list.push(item["geometry"])
+      }
+      console.log("initialized")
+      this.initialized = true;
+    } else {
+      console.log("load geom from stored list")
+      for (let i=0; i < geojson["features"].length; i++) {
+        geojson["features"][i]["geometry"] = this.geometry_list[i];
+      }
+    }
 
     console.log("checkpoint remove old");
     if (globalThis.oldGEOJSON) {
@@ -90,7 +107,7 @@ export class MapComponent implements OnInit {
     else  {
       console.log("checkpoint undefined")
     }
-    
+
 
     let max = d3.max(
       geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
