@@ -3,8 +3,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 import {MatDialogModule} from '@angular/material/dialog';
 
-declare var norm4Back: String;
-declare var rate4Back: String;
+declare global {
+  var rate4Back: string; 
+}
+
+declare global {
+  var norm4Back: string; 
+}
 
 @Component({
   selector: 'app-settings',
@@ -12,7 +17,6 @@ declare var rate4Back: String;
   styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent {
-  
   constructor(public dialog: MatDialog) {}
 
   @Output()
@@ -53,14 +57,15 @@ export class DialogElementsExampleDialog {}
   templateUrl: './dialog-content-settings.html',
 })
 export class DialogForSettings {
-  normWhich(data:String) {
+  normWhich(data:string) {
     //console.log('erfolg' + data);
     globalThis.norm4Back= data;
   }
 
-  rateWhich(data:String) {
+  rateWhich(data:string) {
     //console.log('erfolg' + data);
-    globalThis.rate4Back= data;
+    globalThis.rate4Back = data;
+    //window.rate4Back= data;
   }
 
 }
