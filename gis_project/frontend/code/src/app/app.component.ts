@@ -3,6 +3,8 @@ import { FeatureCollection } from 'geojson';
 import { MapComponent } from './map/map.component';
 import { DataService } from './services/data.service';
 
+
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -19,13 +21,12 @@ export class AppComponent implements AfterViewInit {
   constructor(private dataservice: DataService) {}
 
   ngAfterViewInit(): void {
-    //TBC send Fert and Normalized
     console.log('ViewInit');
-    /*this.dataservice.getBarDistribution(2007).subscribe((geojson: FeatureCollection) => {
+    
+    this.dataservice.getBarDistribution(2007, "norm" ,"fert").subscribe((geojson: FeatureCollection) => {
       console.log("Data retrieved from backend")
       this.mapcomponent.addGeoJSON(geojson);
-    });*/
-    
+    });
   }
 
   updateView(): void {
@@ -37,9 +38,9 @@ export class AppComponent implements AfterViewInit {
     console.log("norm " + globalThis.norm4Back);
     console.log('rate is ' + globalThis.rate4Back);
   
-    //this.dataservice.getBarDistribution(dateValue).subscribe((geojson: FeatureCollection) => {
-    //  console.log("Data retrieved from backend");
-    //  this.mapcomponent.addGeoJSON(geojson);
-    //});
+    this.dataservice.getBarDistribution(+dateValue, globalThis.norm4Back, globalThis.rate4Back).subscribe((geojson: FeatureCollection) => {
+      console.log("Data retrieved from backend");
+      this.mapcomponent.addGeoJSON(geojson);
+    });
   }
 }

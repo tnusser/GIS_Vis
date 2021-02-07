@@ -3,6 +3,11 @@ import { Feature, FeatureCollection, Geometry, MultiPolygon } from 'geojson';
 import * as L from 'leaflet';
 import * as d3 from 'd3';
 
+
+declare global {
+  var oldGEOJSON: any; 
+}
+
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
@@ -29,6 +34,7 @@ export class MapComponent implements OnInit {
     //console.log(this.mySlider1.nativeElement.innerHTML);
     //console.log(document.getElementById("myRange").value);
     console.log((<HTMLInputElement>document.getElementById("myRange")).value);
+    //TBC
     this.viewUpdate.emit(true);
   }
 
@@ -39,33 +45,6 @@ export class MapComponent implements OnInit {
     (<HTMLInputElement>document.getElementById("bubbles")).innerHTML = (<HTMLInputElement>document.getElementById("myRange")).value
   }
   
-  @Input()
-  set amenities(
-    value: { name: string; latitude: number; longitude: number }[]
-  ) {
-    this._amenities = value;
-    this.updateAmenitiesLayer();
-  }
-
-  private updateAmenitiesLayer() {
-    if (!this.map) {
-      return;
-    }
-
-    // remove old amenities
-    this.map.removeLayer(this.amenitiesLayer);
-
-    // create a marker for each supplied amenity
-    const markers = this.amenities.map((a) =>
-      L.marker([a.latitude, a.longitude]).bindPopup(a.name)
-    );
-
-    // create a new layer group and add it to the map
-    this.amenitiesLayer = L.layerGroup(markers);
-    markers.forEach((m) => m.addTo(this.amenitiesLayer));
-    this.map.addLayer(this.amenitiesLayer);
-  }
-
   /**
    * Often divs and other HTML element are not available in the constructor. Thus we use onInit()
    */
@@ -103,6 +82,16 @@ export class MapComponent implements OnInit {
    */
   public addGeoJSON(geojson: FeatureCollection): void {
     // find maximum numbars value in array
+
+    console.log("checkpoint remove old");
+    if (globalThis.oldGEOJSON) {
+      globalThis.oldGEOJSON.removeFrom(this.map);
+    }
+    else  {
+      console.log("checkpoint undefined")
+    }
+    
+
     let max = d3.max(
       geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
     );
@@ -144,15 +133,6 @@ export class MapComponent implements OnInit {
           fillOpacity: 0.7,
         };
       }
-      /*
-      return {
-        fillColor: colorscale(numbars),
-        weight: 2,
-        opacity: 1,
-        color: 'red',
-        dashArray: '3',
-        fillOpacity: 0.7,
-      };*/
     };
 
     // each feature gets an additional popup!
@@ -163,6 +143,7 @@ export class MapComponent implements OnInit {
         typeof feature.properties.numbars !== 'undefined'
       ) {
         layer.bindPopup(
+          //TBC if
           `${feature.properties.name} has ${feature.properties.numbars} birth${
             feature.properties.numbars > 0 ? 's' : ''
           }`
@@ -175,6 +156,15 @@ export class MapComponent implements OnInit {
       onEachFeature,
       style,
     });
+    globalThis.oldGEOJSON = geoJSON;
+    console.log("checkpoint add new");
     geoJSON.addTo(this.map);
+
+    //console.log(globalThis.oldGEOJSON);
+  }
+
+  public removeOldGeo(geojson: FeatureCollection): void {
+    console.log('tried remove');
+  //  this.map.removeLayer(geojson);
   }
 }
