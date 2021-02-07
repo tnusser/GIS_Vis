@@ -25,7 +25,7 @@ export class DataService {
     var dataRate: any;
     var dataDate: any;
 
-    // handle undefined case 
+    // handle undefined case
 
     if (!normDec) { //if undefined
       dataAbs = {'relative':true, 'absolute' : false };
@@ -38,26 +38,26 @@ export class DataService {
     }
 
     if (!rateDec) { //if undefined
-      dataRate = {'birth' : true, 'death' : false};  
+      dataRate = {'birth' : true, 'death' : false};
     }
     else if (rateDec=="fert") {
-      dataRate = {'birth' : true, 'death' : false};  
+      dataRate = {'birth' : true, 'death' : false};
     }
     else if (rateDec=="mort"){
-      dataRate = {'birth' : false, 'death' : true}; 
+      dataRate = {'birth' : false, 'death' : true};
     }
     else {
       dataRate = {'birth' : true, 'death' : true};
     }
 
     dataDate = {'year': date};
-    
+
     let data = {
       ...dataRate,
       ...dataDate,
       ...dataAbs      
     };
-   
+
     //console.log(dataRate);
     //console.log(data);
     //let data = {'birth' : true, 'death' : false, 'year' : date, 'relative' : true , 'absolute' : false}
