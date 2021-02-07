@@ -55,7 +55,7 @@ export class DataService {
     let data = {
       ...dataRate,
       ...dataDate,
-      ...dataAbs      
+      ...dataAbs
     };
 
     //console.log(dataRate);

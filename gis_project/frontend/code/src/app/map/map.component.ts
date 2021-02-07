@@ -85,6 +85,7 @@ export class MapComponent implements OnInit {
    * @param latitude
    */
   public addGeoJSON(geojson: FeatureCollection): void {
+
     // find maximum numbars value in array
     // console.log(geojson["features"][0]["type"])
     if (!this.initialized || this.geometry_list.length == 0) {
