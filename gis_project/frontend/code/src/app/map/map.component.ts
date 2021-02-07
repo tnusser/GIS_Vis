@@ -110,6 +110,14 @@ export class MapComponent implements OnInit {
       console.log("checkpoint undefined")
     }
 
+    let color_class = {"A1": "#e8e8e8", "B1" : "#dfb0d6", "C1" : "#be64ac",
+                         "A2": "#ace4e4", "B2" : "#a5add3", "C2" : "#8c62aa",
+                          "A3": "#5ac8c8", "B3" : "#5698b9", "C3" : "#3b4994"}
+
+    // #be64ac #8c62aa #3b4994
+    // #dfb0d6 #a5add3 #5698b9
+    // #e8e8e8 #ace4e4 #5ac8c8
+
 
     let max = d3.max(
       geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
@@ -180,7 +188,7 @@ export class MapComponent implements OnInit {
             layer.bindPopup(div);
       }
     };
-   
+
 
     // create one geoJSON layer and add it to the map
     const geoJSON = L.geoJSON(geojson, {
