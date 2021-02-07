@@ -2,6 +2,7 @@ import { Component, Input, OnInit, EventEmitter, Output  } from '@angular/core';
 import { Feature, FeatureCollection, Geometry, MultiPolygon } from 'geojson';
 import * as L from 'leaflet';
 import * as d3 from 'd3';
+import { svg } from 'd3';
 
 
 declare global {
@@ -160,14 +161,26 @@ export class MapComponent implements OnInit {
         feature.properties.name &&
         typeof feature.properties.numbars !== 'undefined'
       ) {
-        layer.bindPopup(
-          //TBC if
-          `${feature.properties.name} has ${feature.properties.numbars} birth${
-            feature.properties.numbars > 0 ? 's' : ''
-          }`
-        );
+        var div = `<h1>${feature.properties.name}</h1>
+                   <p>${feature.properties.name} had ${feature.properties.numbars} birth${feature.properties.numbars > 0 ? 's' : ''}</p>
+                   <div id="try"></div>`;
+
+        var svg = d3.select('[id="try"]')
+            .append("svg")
+            .attr("width", 200)
+            .attr("height", 200);
+
+            svg.append('circle')
+            .attr('cx', 100)
+            .attr('cy', 100)
+            .attr('r', 50)
+            .attr('stroke', 'black')
+            .attr('fill', '#69a3b2');
+
+            layer.bindPopup(div);
       }
     };
+   
 
     // create one geoJSON layer and add it to the map
     const geoJSON = L.geoJSON(geojson, {
