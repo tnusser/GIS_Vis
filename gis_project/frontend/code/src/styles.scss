@@ -5,3 +5,16 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.legend_bivariate {
+  line-height: 18px;
+  color: #555;
+  overflow:auto;
+  left: -150px;
+  bottom: 100px;
+  transform: rotate(315deg);
+  margin: 20px 20px 0 0;
+  //border: 5px solid #333;
+}
+.paddingBetweenCol th{
+  padding: 35px
+}

@@ -4,7 +4,6 @@ import * as L from 'leaflet';
 import * as d3 from 'd3';
 import { svg } from 'd3';
 
-
 declare global {
   var oldGEOJSON: any;
 }
@@ -15,6 +14,10 @@ declare global {
   styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit {
+
+  private color_class : {[index: string]:string} = {"A3": "#5ac8c8", "B3" : "#5698b9", "C3" : "#3b4994",
+    "A2": "#ace4e4", "B2" : "#a5add3", "C2" : "#8c62aa",
+    "A1": "#c7bebe", "B1" : "#dfb0d6", "C1" : "#be64ac"}
 
   private geometry_list: Array<Geometry> = [];
   private initialized: boolean = false;
@@ -79,6 +82,42 @@ export class MapComponent implements OnInit {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map);
+
+
+
+    let color_class_arr : string[] = []
+    for (var key in this.color_class) {
+      color_class_arr.push(this.color_class[key])
+    }
+    console.log(color_class_arr);
+    // #be64ac #8c62aa #3b4994
+    // #dfb0d6 #a5add3 #5698b9
+    // #e8e8e8 #ace4e4 #5ac8c8
+
+
+    var legend = L.control({position: 'bottomright'});
+
+    legend.onAdd = function () {
+
+      var div = L.DomUtil.create('div', 'info legend_bivariate')
+      let legend_str = "<table class='paddingBetweenCol'>"
+      let c = 0
+      for (var i = 0; i < 3; i++) {
+        legend_str += "<tr>"
+        for (var j = 0; j < 3; j++) {
+          legend_str += "<th style='background: " + color_class_arr[c] + "'></th>"
+          c += 1
+        }
+        legend_str += "</tr>"
+      }
+      legend_str += "</table>"
+
+      div.innerHTML = legend_str
+      return div;
+    };
+
+
+    legend.addTo(this.map);
   }
 
   /**
@@ -110,14 +149,6 @@ export class MapComponent implements OnInit {
       console.log("checkpoint undefined")
     }
 
-    let color_class = {"A1": "#e8e8e8", "B1" : "#dfb0d6", "C1" : "#be64ac",
-                         "A2": "#ace4e4", "B2" : "#a5add3", "C2" : "#8c62aa",
-                          "A3": "#5ac8c8", "B3" : "#5698b9", "C3" : "#3b4994"}
-
-    // #be64ac #8c62aa #3b4994
-    // #dfb0d6 #a5add3 #5698b9
-    // #e8e8e8 #ace4e4 #5ac8c8
-
 
     let max = d3.max(
       geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
@@ -145,17 +176,17 @@ export class MapComponent implements OnInit {
           fillColor: 'white',
           weight: 2,
           opacity: 1,
-          color: 'red',
+          color: 'grey',
           dashArray: '3',
           fillOpacity: 0.7,
         };
       }
       else {
         return {
-          fillColor: colorscale(numbars),
+          fillColor: this.color_class[feature?.properties.dual],
           weight: 2,
           opacity: 1,
-          color: 'red',
+          color: 'grey',
           dashArray: '3',
           fillOpacity: 0.7,
         };
@@ -185,9 +216,11 @@ export class MapComponent implements OnInit {
             .attr('stroke', 'black')
             .attr('fill', '#69a3b2');
 
+
             layer.bindPopup(div);
       }
     };
+
 
 
     // create one geoJSON layer and add it to the map
