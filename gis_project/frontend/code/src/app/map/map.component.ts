@@ -84,9 +84,13 @@ export class MapComponent implements OnInit {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map);
+  }
 
-
-
+  /**
+   * Add a GeoJSON FeatureCollection to this map
+   * @param latitude
+   */
+  public addGeoJSON(geojson: FeatureCollection): void {
     let color_class_arr : string[] = []
     for (var key in this.color_class) {
       color_class_arr.push(this.color_class[key])
@@ -101,34 +105,41 @@ export class MapComponent implements OnInit {
       options: { position: 'bottomright' }
     }));
 
-    legend.onAdd = function () {
+     legend.onAdd = function () {
+      if (!globalThis.rate4Back || globalThis.rate4Back == "fert" ||globalThis.rate4Back == "mort") {
+        var div = L.DomUtil.create('div', 'info legend'),
+        grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+        labels = [];
 
-      var div = L.DomUtil.create('div', 'info legend_bivariate')
-      let legend_str = "<table class='paddingBetweenCol'>"
-      let c = 0
-      for (var i = 0; i < 3; i++) {
-        legend_str += "<tr>"
-        for (var j = 0; j < 3; j++) {
-          legend_str += "<th style='background: " + color_class_arr[c] + "'></th>"
-          c += 1
+        // loop through our density intervals and generate a label with a colored square for each interval
+        for (var i = 0; i < grades.length; i++) {
+          div.innerHTML +=
+            '<i style="background:green"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
         }
-        legend_str += "</tr>"
-      }
-      legend_str += "</table>"
-
-      div.innerHTML = legend_str
       return div;
+      }
+      else {
+        var div = L.DomUtil.create('div', 'info legend_bivariate')
+        let legend_str = "<table class='paddingBetweenCol'>"
+        let c = 0
+        for (var i = 0; i < 3; i++) {
+          legend_str += "<tr>"
+          for (var j = 0; j < 3; j++) {
+            legend_str += "<th style='background: " + color_class_arr[c] + "'></th>"
+            c += 1
+          }
+          legend_str += "</tr>"
+        }
+        legend_str += "</table>"
+
+        div.innerHTML = legend_str
+        return div;
+      }
     };
 
 
     legend.addTo(this.map);
-  }
-
-  /**
-   * Add a GeoJSON FeatureCollection to this map
-   * @param latitude
-   */
-  public addGeoJSON(geojson: FeatureCollection): void {
 
     // find maximum numbars value in array
     // console.log(geojson["features"][0]["type"])
@@ -181,28 +192,52 @@ export class MapComponent implements OnInit {
       const numbars = feature?.properties?.numbars
         ? feature.properties.numbars
         : 0;
-
-      // console.log(numbars);
-      if(numbars == -1) {
-        return {
-          fillColor: 'white',
-          weight: 2,
-          opacity: 1,
-          color: 'grey',
-          dashArray: '3',
-          fillOpacity: 0.7,
-        };
+      if(!globalThis.rate4Back || globalThis.rate4Back == "fert" ||globalThis.rate4Back == "mort") {
+        // console.log(numbars);
+        if(numbars == -1) {
+          return {
+            fillColor: 'white',
+            weight: 2,
+            opacity: 1,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.7,
+          };
+        }
+        else {
+          return {
+            fillColor: colorscale(numbars),
+            //fillColor: this.color_class[feature?.properties.dual],
+            weight: 2,
+            opacity: 1,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.7,
+          };
+        }
       }
       else {
-        return {
-          // fillColor: colorscale(numbars),
-          fillColor: this.color_class[feature?.properties.dual],
-          weight: 2,
-          opacity: 1,
-          color: 'grey',
-          dashArray: '3',
-          fillOpacity: 0.7,
-        };
+        if(numbars == -1) {
+          return {
+            fillColor: 'white',
+            weight: 2,
+            opacity: 1,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.7,
+          };
+        }
+        else {
+          return {
+            //fillColor: colorscale(numbars),
+            fillColor: this.color_class[feature?.properties.dual],
+            weight: 2,
+            opacity: 1,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.7,
+          };
+        }
       }
     };
 
