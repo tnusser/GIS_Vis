@@ -30,17 +30,6 @@ export class MapComponent implements OnInit {
   private initialized: boolean = false;
 
   private map!: L.Map;
-  private amenitiesLayer: L.LayerGroup<any> = L.layerGroup();
-
-  private _amenities: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  }[] = [];
-
-  get amenities(): { name: string; latitude: number; longitude: number }[] {
-    return this._amenities;
-  }
 
   @Output()
   viewUpdate: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -122,19 +111,111 @@ export class MapComponent implements OnInit {
 
     globalThis.oldLegend.onAdd = function () {
       if (!globalThis.rate4Back || globalThis.rate4Back == "fert" ||globalThis.rate4Back == "mort") {
-        var div = L.DomUtil.create('div', 'info legend'),
-        grades = [0, 10, 20, 50, 100, 200, 500, 1000],
-        labels = [];
-
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-          div.innerHTML +=
-            '<i style="background:green"></i> ' +
-            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+        //Headline Parameter 1.
+        let appendStringLegend: string;
+        if(globalThis.rate4Back == "mort" ) {
+          appendStringLegend="Mortality";
         }
-      return div;
+        else {
+          appendStringLegend="Fertility";
+        }
+
+        //Headline Parameter 2.
+        let appendStringLegend2: string;
+        if(globalThis.norm4Back == "abs" ) {
+          appendStringLegend2="Absolute";
+        }
+        else {
+          appendStringLegend2="Normalized";
+        }
+
+        //Get Max Value out of cuurent numbars
+        let maxNumbars = d3.max(
+          geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
+        );
+        
+        if (!maxNumbars) {
+          maxNumbars = 1;
+        }
+
+        const colorscaleLegend = d3.scaleSequential().domain([0, maxNumbars as number]).interpolator(d3.interpolateViridis);
+
+        //1D Legend, stating Rate, Norm or Abs, Values and Colors
+        var divLegendMain = L.DomUtil.create('div', 'info legend');
+        var divLegend = L.DomUtil.create('div', 'info legend');
+        
+        var legendheight = 200,
+            legendwidth = 80,
+            margin = {top: 10, right: 60, bottom: 10, left: 2};
+
+       var canvas:any; 
+       canvas =  d3.select(divLegend)
+                  .style("height", legendheight + "px")
+                  .style("width", legendwidth + "px")
+                  .style("position", "relative")
+                  .append("canvas")
+                  .attr("height", legendheight - margin.top - margin.bottom)
+                  .attr("width", 1)
+                  .style("height", (legendheight - margin.top - margin.bottom) + "px")
+                  .style("width", (legendwidth - margin.left - margin.right) + "px")
+                  .style("border", "1px solid #000")
+                  .style("position", "absolute")
+                  .style("top", (margin.top) + "px")
+                  .style("left", (margin.left) + "px")
+                  .node();
+
+        var ctx = canvas.getContext("2d");
+  
+        var legendscale = d3.scaleLinear()
+                          .range([1, legendheight - margin.top - margin.bottom])
+                          .domain(colorscaleLegend.domain());
+
+        // image data hackery 
+        var image = ctx.createImageData(1, legendheight);
+        
+        d3.range(legendheight).forEach(function(i) {
+          var c = d3.rgb(colorscaleLegend(legendscale.invert(i)));
+          image.data[4*i] = c.r;
+          image.data[4*i + 1] = c.g;
+          image.data[4*i + 2] = c.b;
+          image.data[4*i + 3] = 255;
+        });
+        ctx.putImageData(image, 0, 0);
+        
+        var legendaxis = d3.axisRight(legendscale)
+                          .tickSize(6)
+                          .ticks(8);
+
+        //append legend to previously creted Div
+        var svg = d3.select(divLegend)
+          .append("svg")
+          .attr("height", (legendheight) + "px")
+          .attr("width", (legendwidth) + "px")
+          .style("position", "absolute")
+          .style("left", "0px")
+          .style("top", "0px")
+
+        svg
+          .append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
+          .call(legendaxis);
+  
+        var divText = `<h2>${appendStringLegend2} <br>${appendStringLegend}-Rate</h2>`;
+        // return Div created
+        // cast the DOM-element for string "div" to be properly displayed
+        var forms = L.DomUtil.create('form', 'my-form');
+        forms.innerHTML = divText;
+
+        // put created elements into one div and visualize it
+        divLegendMain.append(forms);
+        divLegendMain.append(divLegend);
+        divLegendMain.style.backgroundColor = "white";
+        return divLegendMain;
       }
       else {
+        //Tobias here. append pic to div. Else not removed
+        //2D legend, stating vlaues and colors
         var div = L.DomUtil.create('div', 'info legend_bivariate')
         let legend_str = "<table class='paddingBetweenCol'>"
         let c = 0
@@ -176,14 +257,6 @@ export class MapComponent implements OnInit {
     else  {
       console.log("checkpoint undefined")
     }
-
-    let color_class = {"A1": "#e8e8e8", "B1" : "#dfb0d6", "C1" : "#be64ac",
-                         "A2": "#ace4e4", "B2" : "#a5add3", "C2" : "#8c62aa",
-                          "A3": "#5ac8c8", "B3" : "#5698b9", "C3" : "#3b4994"}
-
-    // #be64ac #8c62aa #3b4994
-    // #dfb0d6 #a5add3 #5698b9
-    // #e8e8e8 #ace4e4 #5ac8c8
 
 
     let max = d3.max(
