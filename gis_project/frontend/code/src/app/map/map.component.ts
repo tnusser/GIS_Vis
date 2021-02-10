@@ -94,7 +94,7 @@ export class MapComponent implements OnInit {
     // #dfb0d6 #a5add3 #5698b9
     // #e8e8e8 #ace4e4 #5ac8c8
 
-    
+
     console.log("checkpoint remove old Legend");
     if (globalThis.oldLegend) {
       globalThis.oldLegend.remove();
@@ -104,7 +104,7 @@ export class MapComponent implements OnInit {
       console.log("Could not Remove");
     }
 
-    
+
     globalThis.oldLegend = new (L.Control.extend({
       options: { position: 'bottomright' }
     }));
@@ -120,6 +120,59 @@ export class MapComponent implements OnInit {
           appendStringLegend="Fertility";
         }
 
+
+      // Legend via d3
+      //
+      // var size = 3;
+      // dataset = [];
+      // colors = ["#5ac8c8", "#5698b9", "#3b4994","#ace4e4", "#a5add3", "#8c62aa","#e8e8e8", "#dfb0d6", "#be64ac"]
+      // for (var y = 0; y < size; y++) {
+      //   for (var x = 0; x < size; x++) {
+      //     dataset.push(5);
+      //   };
+      // };
+      // console.log(d3.select("svg"))
+      // var chart = d3.select(".chart")
+      // var bar = chart.selectAll("g")
+      //
+      //
+      //
+      // var svg = d3.select("svg");
+      //
+      // svg.selectAll("rect")
+      //   .data(dataset)
+      //   .enter()
+      //   .append("rect")
+      //   .attr("x", function(d, i) {
+      //     return (i%size)*50
+      //   })
+      //   .attr("y", function(d, i) {
+      //     return parseInt(i/size) * 50;
+      //   })
+      //   .attr("height", function(d) {
+      //     return 50;
+      //   })
+      //   .attr("width", 50)
+      //   .attr("fill", function(d, i) {
+      //     return colors[i];
+      //   })
+      //   //.attr("transform", "translate(100,150) rotate(315)") //rotate(315)
+      //   .attr("transform", "translate(50,50)")
+
+
+      // Legend via HTML Table
+
+      //let legend_str = "<table class='paddingBetweenCol'>"
+      // let c = 0
+      // for (var i = 0; i < 3; i++) {
+      //   legend_str += "<tr>"
+      //   for (var j = 0; j < 3; j++) {
+      //     legend_str += "<th style='background: " + color_class_arr[c] + "'></th>"
+      //     c += 1
+      //   }
+      //   legend_str += "</tr>"
+      // }
+      // legend_str += "</table>"
         //Headline Parameter 2.
         let appendStringLegend2: string;
         if(globalThis.norm4Back == "abs" ) {
@@ -133,7 +186,7 @@ export class MapComponent implements OnInit {
         let maxNumbars = d3.max(
           geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
         );
-        
+
         if (!maxNumbars) {
           maxNumbars = 1;
         }
@@ -143,12 +196,12 @@ export class MapComponent implements OnInit {
         //1D Legend, stating Rate, Norm or Abs, Values and Colors
         var divLegendMain = L.DomUtil.create('div', 'info legend');
         var divLegend = L.DomUtil.create('div', 'info legend');
-        
+
         var legendheight = 200,
             legendwidth = 80,
             margin = {top: 10, right: 60, bottom: 10, left: 2};
 
-       var canvas:any; 
+       var canvas:any;
        canvas =  d3.select(divLegend)
                   .style("height", legendheight + "px")
                   .style("width", legendwidth + "px")
@@ -165,14 +218,14 @@ export class MapComponent implements OnInit {
                   .node();
 
         var ctx = canvas.getContext("2d");
-  
+
         var legendscale = d3.scaleLinear()
                           .range([1, legendheight - margin.top - margin.bottom])
                           .domain(colorscaleLegend.domain());
 
-        // image data hackery 
+        // image data hackery
         var image = ctx.createImageData(1, legendheight);
-        
+
         d3.range(legendheight).forEach(function(i) {
           var c = d3.rgb(colorscaleLegend(legendscale.invert(i)));
           image.data[4*i] = c.r;
@@ -181,7 +234,7 @@ export class MapComponent implements OnInit {
           image.data[4*i + 3] = 255;
         });
         ctx.putImageData(image, 0, 0);
-        
+
         var legendaxis = d3.axisRight(legendscale)
                           .tickSize(6)
                           .ticks(8);
@@ -218,18 +271,7 @@ export class MapComponent implements OnInit {
         //Tobias here. append pic to div. Else not removed
         //2D legend, stating vlaues and colors
         var div = L.DomUtil.create('div', 'info legend_bivariate')
-        let legend_str = "<table class='paddingBetweenCol'>"
-        let c = 0
-        for (var i = 0; i < 3; i++) {
-          legend_str += "<tr>"
-          for (var j = 0; j < 3; j++) {
-            legend_str += "<th style='background: " + color_class_arr[c] + "'></th>"
-            c += 1
-          }
-          legend_str += "</tr>"
-        }
-        legend_str += "</table>"
-
+        let legend_str = "<img src=assets/bivariate.png width='200' height='200' alt='Could not load legend'/>"
         div.innerHTML = legend_str;
         return div;
       }
@@ -288,7 +330,7 @@ export class MapComponent implements OnInit {
             opacity: 1,
             color: 'grey',
             dashArray: '3',
-            fillOpacity: 0.7,
+            fillOpacity: 0.3,
           };
         }
         else {
@@ -304,14 +346,25 @@ export class MapComponent implements OnInit {
         }
       }
       else {
-        return {
-          //fillColor: colorscale(numbars),
-          fillColor: this.color_class[feature?.properties.dual],
-          weight: 2,
-          opacity: 1,
-          color: 'grey',
-          dashArray: '3',
-          fillOpacity: 0.7,
+        if(numbars == -1) {
+          return {
+            fillColor: 'white',
+            weight: 2,
+            opacity: 1,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.3,
+          } }
+          else {
+            return {
+              //fillColor: colorscale(numbars),
+              fillColor: this.color_class[feature?.properties.dual],
+              weight: 2,
+              opacity: 1,
+              color: 'grey',
+              dashArray: '3',
+              fillOpacity: 0.7,
+            }
         };
       }
     };
@@ -433,7 +486,7 @@ export class MapComponent implements OnInit {
           }
         //use .nest()function to group data so the line can be computed for each group
         var sumstat = nest<getTheData>()
-                      .key(function (d){return d.yVal;})
+                      .key(function (d : any){return d.yVal;})
                       .entries(data);
 
                       //console.log(sumstat);
