@@ -95,7 +95,9 @@ export class MapComponent implements OnInit {
     // #e8e8e8 #ace4e4 #5ac8c8
 
 
-    var legend = L.control({position: 'bottomright'});
+    var legend = new (L.Control.extend({
+      options: { position: 'bottomright' }
+    }));
 
     legend.onAdd = function () {
 
