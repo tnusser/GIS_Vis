@@ -34,7 +34,7 @@ def get_Boundaries():
         init = False
 
     if birth and death:
-        dual = True
+        numbars = "birth"
     else:
         dual = False
         if birth:

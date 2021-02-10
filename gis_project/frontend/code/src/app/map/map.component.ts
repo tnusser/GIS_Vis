@@ -120,9 +120,6 @@ export class MapComponent implements OnInit {
           appendStringLegend="Fertility";
         }
 
-      var div = L.DomUtil.create('div', 'info legend_bivariate')
-      // Legend via image
-      let legend_str = "<img src=assets/bivariate.png width='200' height='200' alt='Could not load legend'/>"
 
       // Legend via d3
       //
@@ -273,18 +270,7 @@ export class MapComponent implements OnInit {
         //Tobias here. append pic to div. Else not removed
         //2D legend, stating vlaues and colors
         var div = L.DomUtil.create('div', 'info legend_bivariate')
-        let legend_str = "<table class='paddingBetweenCol'>"
-        let c = 0
-        for (var i = 0; i < 3; i++) {
-          legend_str += "<tr>"
-          for (var j = 0; j < 3; j++) {
-            legend_str += "<th style='background: " + color_class_arr[c] + "'></th>"
-            c += 1
-          }
-          legend_str += "</tr>"
-        }
-        legend_str += "</table>"
-
+        let legend_str = "<img src=assets/bivariate.png width='200' height='200' alt='Could not load legend'/>"
         div.innerHTML = legend_str;
         return div;
       }
@@ -343,7 +329,7 @@ export class MapComponent implements OnInit {
             opacity: 1,
             color: 'grey',
             dashArray: '3',
-            fillOpacity: 0.7,
+            fillOpacity: 0.3,
           };
         }
         else {
@@ -359,14 +345,25 @@ export class MapComponent implements OnInit {
         }
       }
       else {
-        return {
-          //fillColor: colorscale(numbars),
-          fillColor: this.color_class[feature?.properties.dual],
-          weight: 2,
-          opacity: 1,
-          color: 'grey',
-          dashArray: '3',
-          fillOpacity: 0.7,
+        if(numbars == -1) {
+          return {
+            fillColor: 'white',
+            weight: 2,
+            opacity: 1,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.3,
+          } }
+          else {
+            return {
+              //fillColor: colorscale(numbars),
+              fillColor: this.color_class[feature?.properties.dual],
+              weight: 2,
+              opacity: 1,
+              color: 'grey',
+              dashArray: '3',
+              fillOpacity: 0.7,
+            }
         };
       }
     };
