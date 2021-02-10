@@ -201,7 +201,8 @@ export class MapComponent implements OnInit {
           .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
           .call(legendaxis);
   
-        var divText = `<h2>${appendStringLegend2} <br>${appendStringLegend}-Rate</h2>`;
+        var divText = `<h2>${appendStringLegend2} <br>${appendStringLegend}-Rate</h2>
+                      <p>${appendStringLegend2 =="Normalized" ? '(per 100 000 inhabitants)':''}</p>`;
         // return Div created
         // cast the DOM-element for string "div" to be properly displayed
         var forms = L.DomUtil.create('form', 'my-form');
@@ -348,13 +349,12 @@ export class MapComponent implements OnInit {
         let bipNumberDependingOnYear   : number = dataBIP[indexToSearch];
         let population                 : number = dataPop[indexToSearch];
         let bipPerCapita               : number = Math.round(bipNumberDependingOnYear/population);
-
         //console.log(population);
 
         var div = `<h1>${feature.properties.name}</h1>
         <p>${birthNumberDependingOnYear == -1 ? `${feature.properties.name} had no birth-data available`:`${feature.properties.name} had ${birthNumberDependingOnYear} birth${birthNumberDependingOnYear > 0 ? 's' : ''}`}
         and ${deathNumberDependingOnYear ==-1 ? `there was no death-data` :`${deathNumberDependingOnYear} death${deathNumberDependingOnYear > 0 ? 's' : ''}`} in ${dateValue}.
-        ${bipNumberDependingOnYear == -1? `GDP-Data for ${feature.properties.name} in ${dateValue} is not available.`
+        ${bipPerCapita < 0? `GDP-Data for ${feature.properties.name} in ${dateValue} is not available.`
         : `The GDP per capita of ${feature.properties.name} in ${dateValue} accounted to ${bipPerCapita} Euros.`}</p>`;
 
 
