@@ -217,27 +217,15 @@ export class MapComponent implements OnInit {
         }
       }
       else {
-        if(numbars == -1) {
-          return {
-            fillColor: 'white',
-            weight: 2,
-            opacity: 1,
-            color: 'grey',
-            dashArray: '3',
-            fillOpacity: 0.7,
-          };
-        }
-        else {
-          return {
-            //fillColor: colorscale(numbars),
-            fillColor: this.color_class[feature?.properties.dual],
-            weight: 2,
-            opacity: 1,
-            color: 'grey',
-            dashArray: '3',
-            fillOpacity: 0.7,
-          };
-        }
+        return {
+          //fillColor: colorscale(numbars),
+          fillColor: this.color_class[feature?.properties.dual],
+          weight: 2,
+          opacity: 1,
+          color: 'grey',
+          dashArray: '3',
+          fillOpacity: 0.7,
+        };
       }
     };
 

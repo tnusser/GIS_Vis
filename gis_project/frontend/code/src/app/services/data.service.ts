@@ -47,7 +47,9 @@ export class DataService {
       dataRate = {'birth' : false, 'death' : true};
     }
     else {
-      dataRate = {'birth' : true, 'death' : true};
+      //dataRate = {'birth' : true, 'death' : true};
+      dataRate = {'birth' : false, 'death' : true};
+      console.log("Both True");
     }
 
     dataDate = {'year': date};
