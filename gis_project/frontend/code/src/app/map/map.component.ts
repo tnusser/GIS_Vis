@@ -6,8 +6,13 @@ import {nest} from 'd3-collection';
 import { svg } from 'd3';
 
 export type DataType = {year:any, zVal:any};
+
 declare global {
   var oldGEOJSON: any;
+}
+
+declare global {
+  var oldLegend: any;
 }
 
 @Component({
@@ -25,17 +30,6 @@ export class MapComponent implements OnInit {
   private initialized: boolean = false;
 
   private map!: L.Map;
-  private amenitiesLayer: L.LayerGroup<any> = L.layerGroup();
-
-  private _amenities: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  }[] = [];
-
-  get amenities(): { name: string; latitude: number; longitude: number }[] {
-    return this._amenities;
-  }
 
   @Output()
   viewUpdate: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -84,24 +78,47 @@ export class MapComponent implements OnInit {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map);
+  }
 
-
-
+  /**
+   * Add a GeoJSON FeatureCollection to this map
+   * @param latitude
+   */
+  public addGeoJSON(geojson: FeatureCollection): void {
     let color_class_arr : string[] = []
     for (var key in this.color_class) {
       color_class_arr.push(this.color_class[key])
     }
-    console.log(color_class_arr);
+    //console.log(color_class_arr);
     // #be64ac #8c62aa #3b4994
     // #dfb0d6 #a5add3 #5698b9
     // #e8e8e8 #ace4e4 #5ac8c8
 
 
-    var legend = new (L.Control.extend({
+    console.log("checkpoint remove old Legend");
+    if (globalThis.oldLegend) {
+      globalThis.oldLegend.remove();
+      console.log("Could Remove");
+    }
+    else  {
+      console.log("Could not Remove");
+    }
+
+
+    globalThis.oldLegend = new (L.Control.extend({
       options: { position: 'bottomright' }
     }));
 
-    legend.onAdd = function () {
+    globalThis.oldLegend.onAdd = function () {
+      if (!globalThis.rate4Back || globalThis.rate4Back == "fert" ||globalThis.rate4Back == "mort") {
+        //Headline Parameter 1.
+        let appendStringLegend: string;
+        if(globalThis.rate4Back == "mort" ) {
+          appendStringLegend="Mortality";
+        }
+        else {
+          appendStringLegend="Fertility";
+        }
 
       var div = L.DomUtil.create('div', 'info legend_bivariate')
       // Legend via image
@@ -159,20 +176,120 @@ export class MapComponent implements OnInit {
       //   legend_str += "</tr>"
       // }
       // legend_str += "</table>"
+        //Headline Parameter 2.
+        let appendStringLegend2: string;
+        if(globalThis.norm4Back == "abs" ) {
+          appendStringLegend2="Absolute";
+        }
+        else {
+          appendStringLegend2="Normalized";
+        }
 
-      div.innerHTML = legend_str
-      return div;
+        //Get Max Value out of cuurent numbars
+        let maxNumbars = d3.max(
+          geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
+        );
+
+        if (!maxNumbars) {
+          maxNumbars = 1;
+        }
+
+        const colorscaleLegend = d3.scaleSequential().domain([0, maxNumbars as number]).interpolator(d3.interpolateViridis);
+
+        //1D Legend, stating Rate, Norm or Abs, Values and Colors
+        var divLegendMain = L.DomUtil.create('div', 'info legend');
+        var divLegend = L.DomUtil.create('div', 'info legend');
+
+        var legendheight = 200,
+            legendwidth = 80,
+            margin = {top: 10, right: 60, bottom: 10, left: 2};
+
+       var canvas:any;
+       canvas =  d3.select(divLegend)
+                  .style("height", legendheight + "px")
+                  .style("width", legendwidth + "px")
+                  .style("position", "relative")
+                  .append("canvas")
+                  .attr("height", legendheight - margin.top - margin.bottom)
+                  .attr("width", 1)
+                  .style("height", (legendheight - margin.top - margin.bottom) + "px")
+                  .style("width", (legendwidth - margin.left - margin.right) + "px")
+                  .style("border", "1px solid #000")
+                  .style("position", "absolute")
+                  .style("top", (margin.top) + "px")
+                  .style("left", (margin.left) + "px")
+                  .node();
+
+        var ctx = canvas.getContext("2d");
+
+        var legendscale = d3.scaleLinear()
+                          .range([1, legendheight - margin.top - margin.bottom])
+                          .domain(colorscaleLegend.domain());
+
+        // image data hackery
+        var image = ctx.createImageData(1, legendheight);
+
+        d3.range(legendheight).forEach(function(i) {
+          var c = d3.rgb(colorscaleLegend(legendscale.invert(i)));
+          image.data[4*i] = c.r;
+          image.data[4*i + 1] = c.g;
+          image.data[4*i + 2] = c.b;
+          image.data[4*i + 3] = 255;
+        });
+        ctx.putImageData(image, 0, 0);
+
+        var legendaxis = d3.axisRight(legendscale)
+                          .tickSize(6)
+                          .ticks(8);
+
+        //append legend to previously creted Div
+        var svg = d3.select(divLegend)
+          .append("svg")
+          .attr("height", (legendheight) + "px")
+          .attr("width", (legendwidth) + "px")
+          .style("position", "absolute")
+          .style("left", "0px")
+          .style("top", "0px")
+
+        svg
+          .append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
+          .call(legendaxis);
+
+        var divText = `<h2>${appendStringLegend2} <br>${appendStringLegend}-Rate</h2>`;
+        // return Div created
+        // cast the DOM-element for string "div" to be properly displayed
+        var forms = L.DomUtil.create('form', 'my-form');
+        forms.innerHTML = divText;
+
+        // put created elements into one div and visualize it
+        divLegendMain.append(forms);
+        divLegendMain.append(divLegend);
+        divLegendMain.style.backgroundColor = "white";
+        return divLegendMain;
+      }
+      else {
+        //Tobias here. append pic to div. Else not removed
+        //2D legend, stating vlaues and colors
+        var div = L.DomUtil.create('div', 'info legend_bivariate')
+        let legend_str = "<table class='paddingBetweenCol'>"
+        let c = 0
+        for (var i = 0; i < 3; i++) {
+          legend_str += "<tr>"
+          for (var j = 0; j < 3; j++) {
+            legend_str += "<th style='background: " + color_class_arr[c] + "'></th>"
+            c += 1
+          }
+          legend_str += "</tr>"
+        }
+        legend_str += "</table>"
+
+        div.innerHTML = legend_str;
+        return div;
+      }
     };
-
-
-    legend.addTo(this.map);
-  }
-
-  /**
-   * Add a GeoJSON FeatureCollection to this map
-   * @param latitude
-   */
-  public addGeoJSON(geojson: FeatureCollection): void {
+    globalThis.oldLegend.addTo(this.map);
 
     // find maximum numbars value in array
     // console.log(geojson["features"][0]["type"])
@@ -197,14 +314,6 @@ export class MapComponent implements OnInit {
       console.log("checkpoint undefined")
     }
 
-    let color_class = {"A1": "#e8e8e8", "B1" : "#dfb0d6", "C1" : "#be64ac",
-                         "A2": "#ace4e4", "B2" : "#a5add3", "C2" : "#8c62aa",
-                          "A3": "#5ac8c8", "B3" : "#5698b9", "C3" : "#3b4994"}
-
-    // #be64ac #8c62aa #3b4994
-    // #dfb0d6 #a5add3 #5698b9
-    // #e8e8e8 #ace4e4 #5ac8c8
-
 
     let max = d3.max(
       geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
@@ -225,21 +334,33 @@ export class MapComponent implements OnInit {
       const numbars = feature?.properties?.numbars
         ? feature.properties.numbars
         : 0;
-
-      // console.log(numbars);
-      if(numbars == -1) {
-        return {
-          fillColor: 'white',
-          weight: 2,
-          opacity: 1,
-          color: 'grey',
-          dashArray: '3',
-          fillOpacity: 0.7,
-        };
+      if(!globalThis.rate4Back || globalThis.rate4Back == "fert" ||globalThis.rate4Back == "mort") {
+        // console.log(numbars);
+        if(numbars == -1) {
+          return {
+            fillColor: 'white',
+            weight: 2,
+            opacity: 1,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.7,
+          };
+        }
+        else {
+          return {
+            fillColor: colorscale(numbars),
+            //fillColor: this.color_class[feature?.properties.dual],
+            weight: 2,
+            opacity: 1,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.7,
+          };
+        }
       }
       else {
         return {
-          // fillColor: colorscale(numbars),
+          //fillColor: colorscale(numbars),
           fillColor: this.color_class[feature?.properties.dual],
           weight: 2,
           opacity: 1,
