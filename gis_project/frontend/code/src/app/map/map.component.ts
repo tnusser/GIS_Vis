@@ -195,6 +195,7 @@ export class MapComponent implements OnInit {
       }
       else {
         return {
+          // fillColor: colorscale(numbars),
           fillColor: this.color_class[feature?.properties.dual],
           weight: 2,
           opacity: 1,
@@ -216,7 +217,7 @@ export class MapComponent implements OnInit {
         var elem = <HTMLDivElement>(document.createElement('div'));
 
         let dateValue=(<HTMLInputElement>document.getElementById("myRange")).value;
-        
+
         let timeRange : number[] = [1995,1996,1997,1998,1999,2000,
           2001,2002,2003,2004,2005,2006,
           2007,2008,2009,2010,2011,2012,
@@ -226,19 +227,19 @@ export class MapComponent implements OnInit {
         let dataBirth: number[] = feature.properties.birth;
         let dataBIP  : number[] = feature.properties.bip;
         let dataPop  : number[] = feature.properties.pop;
-        
+
         function checkIndex(age:any) {
           return age == dateValue;
         }
         //get Data out of Array to denote current Year
         let indexToSearch = timeRange.findIndex(checkIndex);
 
-        let birthNumberDependingOnYear : number = dataBirth[indexToSearch]; 
+        let birthNumberDependingOnYear : number = dataBirth[indexToSearch];
         let deathNumberDependingOnYear : number = dataDeath[indexToSearch];
         let bipNumberDependingOnYear   : number = dataBIP[indexToSearch];
-        let population                 : number = dataPop[indexToSearch]; 
-        let bipPerCapita               : number = bipNumberDependingOnYear/population;
-        
+        let population                 : number = dataPop[indexToSearch];
+        let bipPerCapita               : number = Math.round(bipNumberDependingOnYear/population);
+
         //console.log(population);
 
         var div = `<h1>${feature.properties.name}</h1>
@@ -246,13 +247,13 @@ export class MapComponent implements OnInit {
         and ${deathNumberDependingOnYear ==-1 ? `there was no death-data` :`${deathNumberDependingOnYear} death${deathNumberDependingOnYear > 0 ? 's' : ''}`} in ${dateValue}.
         ${bipNumberDependingOnYear == -1? `GDP-Data for ${feature.properties.name} in ${dateValue} is not available.`
         : `The GDP per capita of ${feature.properties.name} in ${dateValue} accounted to ${bipPerCapita} Euros.`}</p>`;
-        
-        
+
+
         var data = [];
         for(var i=0;i<timeRange.length;i++){
           data.push({year:timeRange[i], yVal:"birth",zVal:dataBirth[i], color:"red"});
           data.push({year:timeRange[i], yVal:"death",zVal:dataDeath[i], color:"black"});
-        }                          
+        }
 
         var leftMargin=70;
         var topMargin=30;
@@ -294,8 +295,8 @@ export class MapComponent implements OnInit {
            .attr("dy", ".35em")
            .attr("transform", "rotate(90)")
            .style("text-anchor", "start");
-        
-        //label of x Axis  
+
+        //label of x Axis
         svg.append("text")
            .attr("transform", "translate(250,465)")
            .attr("text-anchor", "end")
@@ -306,15 +307,15 @@ export class MapComponent implements OnInit {
             .attr("class", "axis")
             .attr("transform", `translate(${leftMargin},20)`) //use variable in translate
             .call(yAxis);
-            
-        //var rotateTranslate = d3.svg.transform().rotate(-45).translate(200, 100);  
+
+        //var rotateTranslate = d3.svg.transform().rotate(-45).translate(200, 100);
         //Append y-Axis Label
         svg.append("text")
             .attr("transform", "translate(25,300) rotate(-90)" )
             .style("text-anchor", "middle")
             .text("Number of Births/Deaths");
-    
-    
+
+
         interface getTheData {
               year: number;
               yVal: string;
@@ -322,10 +323,10 @@ export class MapComponent implements OnInit {
               color: string;
           }
         //use .nest()function to group data so the line can be computed for each group
-        var sumstat = nest<getTheData>() 
+        var sumstat = nest<getTheData>()
                       .key(function (d){return d.yVal;})
                       .entries(data);
-        
+
                       //console.log(sumstat);
 
         //append line
@@ -346,7 +347,7 @@ export class MapComponent implements OnInit {
           .attr("stroke", function(d:any){return d.key=="death" ? "black": "red"})
           .attr("stroke-width", 2);
 
-        //append Legend Birth         
+        //append Legend Birth
         svg.append("circle")
             .attr("cx", 440)
             .attr('cy', 10)
@@ -357,8 +358,8 @@ export class MapComponent implements OnInit {
             .attr("x", 450)
             .attr("y",15)
             .text("Birth")
-        
-            
+
+
         //append Legend Death
         svg.append("circle")
             .attr("cx", 440)
@@ -369,9 +370,9 @@ export class MapComponent implements OnInit {
             .attr("x", 450)
             .attr("y", 30)
             .text("Death")
-  
-  
-            
+
+
+
         // cast the DOM-element for string "div" to be properly displayed
         var form = L.DomUtil.create('form', 'my-form');
         form.innerHTML = div;

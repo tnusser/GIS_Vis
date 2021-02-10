@@ -184,9 +184,16 @@ def linechart():
         else:
             pop_dict[res["osm_id"]].append(res["population"])
         if res["osm_id"] not in bip_dict:
-            bip_dict[res["osm_id"]] = [res["bip"]]
+            if res["bip"] > 0:
+                bip_dict[res["osm_id"]] = [res["bip"]*1000]
+            else:
+                bip_dict[res["osm_id"]] = [res["bip"]]
         else:
-            bip_dict[res["osm_id"]].append(res["bip"])
+            if res["bip"] > 0:
+                bip_dict[res["osm_id"]].append(res["bip"]*1000)
+            else:
+                bip_dict[res["osm_id"]].append(res["bip"])
+
     return (birth_dict, death_dict, pop_dict, bip_dict)
 
 def calc_class(values, normalize_values, norm_val, ident):
