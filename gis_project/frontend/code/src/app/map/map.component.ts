@@ -104,17 +104,61 @@ export class MapComponent implements OnInit {
     legend.onAdd = function () {
 
       var div = L.DomUtil.create('div', 'info legend_bivariate')
-      let legend_str = "<table class='paddingBetweenCol'>"
-      let c = 0
-      for (var i = 0; i < 3; i++) {
-        legend_str += "<tr>"
-        for (var j = 0; j < 3; j++) {
-          legend_str += "<th style='background: " + color_class_arr[c] + "'></th>"
-          c += 1
-        }
-        legend_str += "</tr>"
-      }
-      legend_str += "</table>"
+      // Legend via image
+      let legend_str = "<img src=assets/bivariate.png width='200' height='200' alt='Could not load legend'/>"
+
+      // Legend via d3
+      //
+      // var size = 3;
+      // dataset = [];
+      // colors = ["#5ac8c8", "#5698b9", "#3b4994","#ace4e4", "#a5add3", "#8c62aa","#e8e8e8", "#dfb0d6", "#be64ac"]
+      // for (var y = 0; y < size; y++) {
+      //   for (var x = 0; x < size; x++) {
+      //     dataset.push(5);
+      //   };
+      // };
+      // console.log(d3.select("svg"))
+      // var chart = d3.select(".chart")
+      // var bar = chart.selectAll("g")
+      //
+      //
+      //
+      // var svg = d3.select("svg");
+      //
+      // svg.selectAll("rect")
+      //   .data(dataset)
+      //   .enter()
+      //   .append("rect")
+      //   .attr("x", function(d, i) {
+      //     return (i%size)*50
+      //   })
+      //   .attr("y", function(d, i) {
+      //     return parseInt(i/size) * 50;
+      //   })
+      //   .attr("height", function(d) {
+      //     return 50;
+      //   })
+      //   .attr("width", 50)
+      //   .attr("fill", function(d, i) {
+      //     return colors[i];
+      //   })
+      //   //.attr("transform", "translate(100,150) rotate(315)") //rotate(315)
+      //   .attr("transform", "translate(50,50)")
+
+
+      // Legend via HTML Table
+
+      //let legend_str = "<table class='paddingBetweenCol'>"
+      // let c = 0
+      // for (var i = 0; i < 3; i++) {
+      //   legend_str += "<tr>"
+      //   for (var j = 0; j < 3; j++) {
+      //     legend_str += "<th style='background: " + color_class_arr[c] + "'></th>"
+      //     c += 1
+      //   }
+      //   legend_str += "</tr>"
+      // }
+      // legend_str += "</table>"
 
       div.innerHTML = legend_str
       return div;
@@ -324,7 +368,7 @@ export class MapComponent implements OnInit {
           }
         //use .nest()function to group data so the line can be computed for each group
         var sumstat = nest<getTheData>()
-                      .key(function (d){return d.yVal;})
+                      .key(function (d : any){return d.yVal;})
                       .entries(data);
 
                       //console.log(sumstat);
