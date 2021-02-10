@@ -6,8 +6,13 @@ import {nest} from 'd3-collection';
 import { svg } from 'd3';
 
 export type DataType = {year:any, zVal:any};
+
 declare global {
   var oldGEOJSON: any;
+}
+
+declare global {
+  var oldLegend: any;
 }
 
 @Component({
@@ -95,17 +100,27 @@ export class MapComponent implements OnInit {
     for (var key in this.color_class) {
       color_class_arr.push(this.color_class[key])
     }
-    console.log(color_class_arr);
+    //console.log(color_class_arr);
     // #be64ac #8c62aa #3b4994
     // #dfb0d6 #a5add3 #5698b9
     // #e8e8e8 #ace4e4 #5ac8c8
 
+    
+    console.log("checkpoint remove old Legend");
+    if (globalThis.oldLegend) {
+      globalThis.oldLegend.remove();
+      console.log("Could Remove");
+    }
+    else  {
+      console.log("Could not Remove");
+    }
 
-    var legend = new (L.Control.extend({
+    
+    globalThis.oldLegend = new (L.Control.extend({
       options: { position: 'bottomright' }
     }));
 
-     legend.onAdd = function () {
+    globalThis.oldLegend.onAdd = function () {
       if (!globalThis.rate4Back || globalThis.rate4Back == "fert" ||globalThis.rate4Back == "mort") {
         var div = L.DomUtil.create('div', 'info legend'),
         grades = [0, 10, 20, 50, 100, 200, 500, 1000],
@@ -133,13 +148,11 @@ export class MapComponent implements OnInit {
         }
         legend_str += "</table>"
 
-        div.innerHTML = legend_str
+        div.innerHTML = legend_str;
         return div;
       }
     };
-
-
-    legend.addTo(this.map);
+    globalThis.oldLegend.addTo(this.map);
 
     // find maximum numbars value in array
     // console.log(geojson["features"][0]["type"])
