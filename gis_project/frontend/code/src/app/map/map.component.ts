@@ -2,9 +2,10 @@ import { Component, Input, OnInit, EventEmitter, Output  } from '@angular/core';
 import { Feature, FeatureCollection, Geometry, MultiPolygon } from 'geojson';
 import * as L from 'leaflet';
 import * as d3 from 'd3';
+import {nest} from 'd3-collection';
 import { svg } from 'd3';
 
-
+export type DataType = {year:any, zVal:any};
 declare global {
   var oldGEOJSON: any;
 }
@@ -169,24 +170,175 @@ export class MapComponent implements OnInit {
         feature.properties.name &&
         typeof feature.properties.numbars !== 'undefined'
       ) {
+        var mainElement = <HTMLDivElement>(document.createElement('div'));
+        var elem = <HTMLDivElement>(document.createElement('div'));
+
+        let dateValue=(<HTMLInputElement>document.getElementById("myRange")).value;
+        
+        let timeRange : number[] = [1995,1996,1997,1998,1999,2000,
+          2001,2002,2003,2004,2005,2006,
+          2007,2008,2009,2010,2011,2012,
+          2013,2014,2015,2016,2017,2018,2019];
+
+        let dataDeath: number[] = feature.properties.death;
+        let dataBirth: number[] = feature.properties.birth;
+        let dataBIP  : number[] = feature.properties.bip;
+        let dataPop  : number[] = feature.properties.pop;
+        
+        function checkIndex(age:any) {
+          return age == dateValue;
+        }
+        //get Data out of Array to denote current Year
+        let indexToSearch = timeRange.findIndex(checkIndex);
+
+        let birthNumberDependingOnYear : number = dataBirth[indexToSearch]; 
+        let deathNumberDependingOnYear : number = dataDeath[indexToSearch];
+        let bipNumberDependingOnYear   : number = dataBIP[indexToSearch];
+        let population                 : number = dataPop[indexToSearch]; 
+        let bipPerCapita               : number = bipNumberDependingOnYear/population;
+        
+        //console.log(population);
+
         var div = `<h1>${feature.properties.name}</h1>
-                   <p>${feature.properties.name} had ${feature.properties.numbars} birth${feature.properties.numbars > 0 ? 's' : ''}</p>
-                   <div id="try"></div>`;
+        <p>${birthNumberDependingOnYear == -1 ? `${feature.properties.name} had no birth-data available`:`${feature.properties.name} had ${birthNumberDependingOnYear} birth${birthNumberDependingOnYear > 0 ? 's' : ''}`}
+        and ${deathNumberDependingOnYear ==-1 ? `there was no death-data` :`${deathNumberDependingOnYear} death${deathNumberDependingOnYear > 0 ? 's' : ''}`} in ${dateValue}.
+        ${bipNumberDependingOnYear == -1? `GDP-Data for ${feature.properties.name} in ${dateValue} is not available.`
+        : `The GDP per capita of ${feature.properties.name} in ${dateValue} accounted to ${bipPerCapita} Euros.`}</p>`;
+        
+        
+        var data = [];
+        for(var i=0;i<timeRange.length;i++){
+          data.push({year:timeRange[i], yVal:"birth",zVal:dataBirth[i], color:"red"});
+          data.push({year:timeRange[i], yVal:"death",zVal:dataDeath[i], color:"black"});
+        }                          
 
-        var svg = d3.select('[id="try"]')
+        var leftMargin=70;
+        var topMargin=30;
+
+        /*var parseTime = d3.timeParse("%Y");
+
+        data.forEach(function (d) {
+           d.year = parseTime(d.year);
+        });
+*/
+        // xAxis
+        var xScale = d3.scaleTime().domain([1995 as number, 2019 as number]).range([leftMargin, 450])
+
+        // yAxis
+        var yMax=d3.max(data,d=>d.zVal as number)
+        var yMin=d3.min(data,d=>d.zVal as number)
+        var yScale = d3.scaleLinear().domain([yMin as number, yMax as number+200 as number]).range([400, 0])
+
+        var xAxis = d3.axisBottom(xScale)
+                      .tickValues(timeRange)
+                      .tickFormat(d3.format("d"));
+
+        var yAxis = d3.axisLeft(yScale)
+                      .ticks(10);
+
+        // create SVGs and append Axis
+        var svg = d3.select(elem)
             .append("svg")
-            .attr("width", 200)
-            .attr("height", 200);
+            .attr("width", 500)
+            .attr("height", 500);
 
-            svg.append('circle')
-            .attr('cx', 100)
-            .attr('cy', 100)
-            .attr('r', 50)
-            .attr('stroke', 'black')
-            .attr('fill', '#69a3b2');
+        svg.append("g")
+           .attr("class", "axis")
+           .attr("transform", `translate(0,420)`)
+           .call(xAxis)
+           .selectAll("text")
+           .attr("y", 0)
+           .attr("x", 9)
+           .attr("dy", ".35em")
+           .attr("transform", "rotate(90)")
+           .style("text-anchor", "start");
+        
+        //label of x Axis  
+        svg.append("text")
+           .attr("transform", "translate(250,465)")
+           .attr("text-anchor", "end")
+           .text("Year");
 
-            layer.bindPopup(div);
-      }
+        //append y-Axis
+        svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", `translate(${leftMargin},20)`) //use variable in translate
+            .call(yAxis);
+            
+        //var rotateTranslate = d3.svg.transform().rotate(-45).translate(200, 100);  
+        //Append y-Axis Label
+        svg.append("text")
+            .attr("transform", "translate(25,300) rotate(-90)" )
+            .style("text-anchor", "middle")
+            .text("Number of Births/Deaths");
+    
+    
+        interface getTheData {
+              year: number;
+              yVal: string;
+              zVal: number;
+              color: string;
+          }
+        //use .nest()function to group data so the line can be computed for each group
+        var sumstat = nest<getTheData>() 
+                      .key(function (d){return d.yVal;})
+                      .entries(data);
+        
+                      //console.log(sumstat);
+
+        //append line
+        svg.selectAll(".line")
+          .append("g")
+          .attr("class", "line")
+          .data(sumstat)
+          .enter()
+          .append("path")
+          .attr("d", function (d) {
+            return d3.line<getTheData>()
+                .x(d => xScale(d.year))
+                .y(d => yScale(d.zVal))
+                .curve(d3.curveCardinal)
+                (d['values'])
+             })
+          .attr("fill", "none")
+          .attr("stroke", function(d:any){return d.key=="death" ? "black": "red"})
+          .attr("stroke-width", 2);
+
+        //append Legend Birth         
+        svg.append("circle")
+            .attr("cx", 440)
+            .attr('cy', 10)
+            .attr("r", 6)
+            .style("fill", "red")//d => color(d.key
+
+        svg.append("text")
+            .attr("x", 450)
+            .attr("y",15)
+            .text("Birth")
+        
+            
+        //append Legend Death
+        svg.append("circle")
+            .attr("cx", 440)
+            .attr('cy', 25)
+            .attr("r", 6)
+            .style("fill", "black")//d => color(d.key
+        svg.append("text")
+            .attr("x", 450)
+            .attr("y", 30)
+            .text("Death")
+  
+  
+            
+        // cast the DOM-element for string "div" to be properly displayed
+        var form = L.DomUtil.create('form', 'my-form');
+        form.innerHTML = div;
+
+        // put created elements into one div and visualize it
+        mainElement.append(form);
+        mainElement.append(elem);
+        layer.bindPopup(mainElement, {maxWidth : 550, maxHeight: 570});
+        }
     };
 
 

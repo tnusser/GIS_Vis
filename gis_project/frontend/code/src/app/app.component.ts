@@ -23,6 +23,8 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     console.log('ViewInit');
     
+    (<HTMLInputElement>document.getElementById("bubbles")).innerHTML = "2007";
+
     this.dataservice.getBarDistribution(2007, "norm" ,"fert").subscribe((geojson: FeatureCollection) => {
       console.log("Data retrieved from backend")
       this.mapcomponent.addGeoJSON(geojson);
