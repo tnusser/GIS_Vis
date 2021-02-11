@@ -253,7 +253,7 @@ export class MapComponent implements OnInit {
           .attr("class", "axis")
           .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
           .call(legendaxis);
-  
+
         var divText = `<h2>${appendStringLegend2} <br>${appendStringLegend}-Rate</h2>
                       <p>${appendStringLegend2 =="Normalized" ? '(per 100 000 inhabitants)':''}</p>`;
         // return Div created
