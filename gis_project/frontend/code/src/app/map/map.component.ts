@@ -191,7 +191,18 @@ export class MapComponent implements OnInit {
           maxNumbars = 1;
         }
 
-        const colorscaleLegend = d3.scaleSequential().domain([0, maxNumbars as number]).interpolator(d3.interpolateViridis);
+        //TBC morgen
+        let minNumbars = d3.min(
+          geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
+        );
+    
+        
+        console.log("Hier , schau mich an:" + minNumbars);
+        if (!minNumbars) {
+          minNumbars = 1;
+        }
+
+        const colorscaleLegend = d3.scaleSequential().domain([600, maxNumbars as number]).interpolator(d3.interpolateViridis);
 
         //1D Legend, stating Rate, Norm or Abs, Values and Colors
         var divLegendMain = L.DomUtil.create('div', 'info legend');
@@ -306,14 +317,25 @@ export class MapComponent implements OnInit {
       geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
     );
 
+    //TBC morgen -- ignore -1
+    let min = d3.min(
+      geojson.features.map((f: Feature<Geometry, any>) => +f.properties.numbars)
+    );
+
+    if (!min) {
+      min = 1;
+    }
     // if max is undefined, enforce max = 1
     if (!max) {
       max = 1;
     }
+    if (!min) {
+      min = 1;
+    }
 
     const colorscale = d3
       .scaleSequential()
-      .domain([0, max])
+      .domain([600, max])
       .interpolator(d3.interpolateViridis);
 
     // each feature has a custom style
